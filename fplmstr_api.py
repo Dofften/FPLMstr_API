@@ -8,6 +8,13 @@ import typing
 import os
 
 
+# Get the current directory
+current_directory = os.getcwd()
+# Define the path to the directories within the current directory
+models_directory = os.path.join(current_directory, 'models')
+data_directory = os.path.join(current_directory, 'data')
+
+
 api_keys = os.environ
 
 
@@ -27,6 +34,7 @@ class ORJSONResponse(JSONResponse):
     def render(self, content: typing.Any) -> bytes:
         return orjson.dumps(content)
 
+
 description = """
 ## FPL Mstr API helps you do awesome Fantasy Premier League stuff. 🚀
 
@@ -43,6 +51,8 @@ You will be able to:
 * **Get current gameweek number**.
 * **Get match predictions** (_not implemented_).
 """
+
+
 app = FastAPI(default_response_class=ORJSONResponse,
     title="FPL Mstr API",
     description=description,
@@ -136,7 +146,7 @@ def get_team_data(entry_id, gameweek):
 
 
 def current_gameweek():
-    gameweek_data = pd.read_pickle('get_gameweek_data.pkl')
+    gameweek_data = pd.read_pickle(os.path.join(data_directory, 'get_gameweek_data.pkl'))
     try:
         current = gameweek_data[gameweek_data["is_current"]].iloc[-1]["id"]
     except IndexError:  # catch gameweek 0
@@ -146,29 +156,29 @@ def current_gameweek():
 
 def player_data():
     gameweek = current_gameweek()
-    players = pd.read_pickle(f'get_player_data_gw{gameweek}.pkl')
+    players = pd.read_pickle(os.path.join(data_directory, f'get_player_data_gw{gameweek}.pkl'))
     return players
 
 
 def fixtures_data():
-    fixtures = pd.read_pickle('get_fixtures_data.pkl')
+    fixtures = pd.read_pickle(os.path.join(data_directory, 'get_fixtures_data.pkl'))
     return fixtures
 
 
 def club_data():
-    clubs = pd.read_pickle('get_club_data.pkl')
+    clubs = pd.read_pickle(os.path.join(data_directory, 'get_club_data.pkl'))
     return clubs
 
 
 def top_managers_data():
     gameweek = current_gameweek()
-    top_managers = pd.read_pickle(f'top250_gw{gameweek}.pkl')
+    top_managers = pd.read_pickle(os.path.join(data_directory, f'top250_gw{gameweek}.pkl'))
     return top_managers
 
 
 def ai_team_data():
     gameweek = current_gameweek()
-    ai = pd.read_pickle(f'ai_team_gw{gameweek}.pkl')
+    ai = pd.read_pickle(os.path.join(data_directory, f'ai_team_gw{gameweek}.pkl'))
     return ai
 
 
@@ -178,7 +188,7 @@ def fixtures_api(user: str = Depends(authenticate_api_key)):
     fixtures['event'] = fixtures['event'].fillna(0)
     fixturesdf = fixtures[['code','event','id','team_a','team_h','team_a_difficulty','team_h_difficulty','team_code_a', 'team_code_h','team_name_a','team_name_h','team_short_name_a','team_short_name_h']]
     return fixturesdf.to_dict(orient="records")
-    
+
 
 @app.get("/api/fpl/{team_id}")
 def fpl_team(team_id: int, user: str = Depends(authenticate_api_key)):

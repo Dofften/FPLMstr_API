@@ -7,7 +7,15 @@ import pandas as pd
 import requests
 import pulp
 import warnings
+import os
 warnings.filterwarnings("ignore", category=UserWarning, module="pulp")
+
+
+# Get the current directory
+current_directory = os.getcwd()
+# Define the path to the directories within the current directory
+models_directory = os.path.join(current_directory, 'models')
+data_directory = os.path.join(current_directory, 'data')
 
 
 # Overall FPL league ID, 314 for 2019/20 season.
@@ -19,10 +27,10 @@ overall_league_url = "https://fantasy.premierleague.com/api/leagues-classic/"+st
 # Fetch the game data once and use it across the application
 try:
 
-    lods_gk = load('gk_model.joblib')
-    lods_def = load('def_model.joblib')
-    lods_mid = load('mid_model.joblib')
-    lods_fwd = load('fwd_model.joblib')
+    lods_gk = load(os.path.join(models_directory, 'gk_model.joblib'))
+    lods_def = load(os.path.join(models_directory, 'def_model.joblib'))
+    lods_mid = load(os.path.join(models_directory, 'mid_model.joblib'))
+    lods_fwd = load(os.path.join(models_directory, 'fwd_model.joblib'))
 
     game_data = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/").json()
 except requests.exceptions.RequestException as e:
@@ -81,7 +89,7 @@ def SolveLP(df, SquadComposition, MaxElementsPerTeam, BudgetLimit, feature:str):
 
 def load_players():
     gameweek = get_current_gameweek()
-    players_df = pd.read_pickle(f'get_player_data_gw{gameweek}.pkl')
+    players_df = pd.read_pickle(os.path.join(data_directory, f'get_player_data_gw{gameweek}.pkl'))
     return players_df
 
 
@@ -121,7 +129,7 @@ def get_game_data():
 
 def get_gameweek_data():
     gw_data =  pd.DataFrame(get_game_data()["events"])
-    gw_data.to_pickle('get_gameweek_data.pkl')
+    gw_data.to_pickle(os.path.join(data_directory, 'get_gameweek_data.pkl'))
     print(f"Successfully fetched gameweek data on: {time.ctime()}")
     return gw_data
 
@@ -151,7 +159,7 @@ def get_player_data():
 
     gw_df['photo'] = gw_df['photo'].str.replace('.jpg', '.png', regex=False)
 
-    gw_df.to_pickle(f'get_player_data_gw{gameweek}.pkl')
+    gw_df.to_pickle(os.path.join(data_directory, f'get_player_data_gw{gameweek}.pkl'))
 
     print(f"Successfully fetched gw player data and predicted player points on: {time.ctime()}")
     return gw_df
@@ -162,13 +170,13 @@ def get_club_data():
     s = requests.get(url).content
     teams = pd.read_csv(io.StringIO(s.decode('utf-8')))
     teams.rename(columns={'id':'team_id', 'code':'team_code','name':'team_name','short_name':'team_short_name'}, inplace = True)
-    teams.to_pickle('get_club_data.pkl')
+    teams.to_pickle(os.path.join(data_directory, 'get_club_data.pkl'))
     print(f"Successfully fetched club data on: {time.ctime()}")
     return teams    
 
 
 def get_current_gameweek():
-    gameweeks = pd.read_pickle('get_gameweek_data.pkl')
+    gameweeks = pd.read_pickle(os.path.join(data_directory, 'get_gameweek_data.pkl'))
     try:
         current = gameweeks[gameweeks["is_current"]].iloc[-1]["id"]
     except IndexError:  # catch gameweek 0
@@ -184,7 +192,7 @@ def get_fixtures_data():
     combined_df = pd.merge(left=fixtures, right=teams, left_on='team_a', right_on='team_id', how='left', suffixes=('_a', '_h'))
     combined_df = pd.merge(left=combined_df, right=teams, left_on='team_h', right_on='team_id', how='left', suffixes=('_a', '_h'))
     combined_df = combined_df.drop(columns=['team_id_a', 'team_id_h'])
-    combined_df.to_pickle('get_fixtures_data.pkl')
+    combined_df.to_pickle(os.path.join(data_directory, 'get_fixtures_data.pkl'))
     print(f"Successfully fetched fixtures on: {time.ctime()}")
     return combined_df
 
@@ -254,10 +262,10 @@ def top_managers():
     # Remove duplicate rows
     df_unique = final_dataframe_all.drop_duplicates(subset=['web_name'] ,keep='first')
 
-    df_unique.to_pickle(f"all_top250_gw{gameweek}_data.pkl")
+    df_unique.to_pickle(os.path.join(data_directory, f"all_top250_gw{gameweek}_data.pkl"))
     top250df = SolveLP(df_unique, {"Forwards":3,"Midfielders":5,"Defenders":5, "Goalkeepers": 2}, 3, 1000, 'top_ownership')
 
-    top250df.to_pickle(f"top250_gw{gameweek}.pkl")
+    top250df.to_pickle(os.path.join(data_directory, f"top250_gw{gameweek}.pkl"))
 
     print(f"Successfully fetched top 250 managers for GameWeek {gameweek} on: {time.ctime()}")
     return top250df
@@ -267,7 +275,7 @@ def ai_team():
     gameweek = get_current_gameweek()
     player_data = pd.read_pickle(f"get_player_data_gw{gameweek}.pkl")
     ai = SolveLP(player_data, {"Forwards":3,"Midfielders":5,"Defenders":5, "Goalkeepers": 2}, 3, 1000, 'preds')
-    ai.to_pickle(f"ai_team_gw{gameweek}.pkl")
+    ai.to_pickle(os.path.join(data_directory, f"ai_team_gw{gameweek}.pkl"))
     print(f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}")
     return ai
 
@@ -284,4 +292,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
