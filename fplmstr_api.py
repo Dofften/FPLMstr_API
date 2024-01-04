@@ -5,12 +5,7 @@ import pandas as pd
 import requests
 import orjson
 import typing
-import uvicorn
-from dotenv import load_dotenv
 import os
-
-
-load_dotenv()
 
 
 api_keys = os.environ
@@ -217,7 +212,3 @@ def players_api(user: str = Depends(authenticate_api_key)):
 def gameweek_number():
     gameweek = current_gameweek()
     return gameweek.item()
-
-
-if __name__ == "__main__":
-    uvicorn.run("fplmstr_api:app", port=8000, reload=True)
