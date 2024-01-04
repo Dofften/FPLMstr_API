@@ -2,9 +2,26 @@ name: Fetch Data
 run-name: ${{ github.actor }} is fetching data 🔃
 on: 
   schedule:
-  - cron: '30 13 19 6 *'
+  - cron: '45 0 23 1 *'
+  - cron: '15 1 2 2 *'
+  - cron: '0 1 6 2 *'
+  - cron: '0 1 13 2 *'
+  - cron: '0 1 20 2 *'
+  - cron: '0 1 27 2 *'
+  - cron: '0 20 2 3 *'
+  - cron: '0 20 9 3 *'
+  - cron: '0 20 16 3 *'
+  - cron: '0 20 30 3 *'
+  - cron: '15 0 4 4 *'
+  - cron: '0 7 6 4 *'
+  - cron: '0 7 13 4 *'
+  - cron: '0 7 20 4 *'
+  - cron: '0 7 27 4 *'
+  - cron: '0 7 4 5 *'
+  - cron: '0 7 11 5 *'
+  - cron: '0 8 19 5 *'
 jobs:
-  pushRequest:
+  fetchData:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -25,4 +42,16 @@ jobs:
       - name: Test fetch
         run: |
           python test_fetch.py
+      - name: Fetch and organize data
+        run: |
+          python fetch_data.py
+      - name: Configure Git
+        run: |
+          git config --global user.email ${GITHUB_ACTOR}@gmail.com
+          git config --global user.name ${GITHUB_ACTOR}
+      - name: Commit and Push
+        run: |
+          git add .
+          git commit -m "gh-actions updated gw data"
+          git push --force https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git HEAD:${REMOTE_BRANCH}
       - run: echo "🍏 This job's status is ${{ job.status }}."
