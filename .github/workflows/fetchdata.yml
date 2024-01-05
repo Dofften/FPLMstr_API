@@ -2,6 +2,7 @@ name: Fetch Data
 run-name: ${{ github.actor }} is fetching data 🔃
 on: 
   schedule:
+  - cron: '0 14 5 1 *'
   - cron: '45 0 23 1 *'
   - cron: '15 1 2 2 *'
   - cron: '0 1 6 2 *'
@@ -23,7 +24,7 @@ on:
 jobs:
   fetchData:
     env:
-        REMOTE_BRANCH: master
+        REMOTE_BRANCH: main
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
