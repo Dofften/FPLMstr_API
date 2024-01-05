@@ -25,6 +25,7 @@ jobs:
       - name: Test create file
         run: |
           echo "Hello Freddie" > hello.txt
+          ls
       - name: Configure Git
         run: |
           git config --global user.email ${GITHUB_ACTOR}@gmail.com
