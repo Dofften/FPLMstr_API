@@ -1,0 +1,1 @@
+from fplmstr_api import app as application
