@@ -22,6 +22,8 @@ on:
   - cron: '0 8 19 5 *'
 jobs:
   fetchData:
+    env:
+        REMOTE_BRANCH: master
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."

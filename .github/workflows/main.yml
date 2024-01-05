@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} is testing out push request 🚀
 on: [push]
 jobs:
   pushRequest:
+    env:
+      REMOTE_BRANCH: master
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -23,8 +25,13 @@ jobs:
       - name: Test create file
         run: |
           echo "Hello Freddie" > hello.txt
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Trial actions commit
+      - name: Configure Git
+        run: |
+          git config --global user.email ${GITHUB_ACTOR}@gmail.com
+          git config --global user.name ${GITHUB_ACTOR}
+      - name: Commit and Push
+        run: |
+          git add .
+          git commit -m "gh-actions updated gw data"
+          git push --force https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git HEAD:${REMOTE_BRANCH}
       - run: echo "🍏 This job's status is ${{ job.status }}."
