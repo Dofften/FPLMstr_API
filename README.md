@@ -15,4 +15,4 @@ You will be able to:
 
 
 
-[workflow status](https://github.com/Dofften/FPLMstr_API/actions/workflows/main.yml/badge.svg?event=push)
+[!workflow status](https://github.com/Dofften/FPLMstr_API/actions/workflows/main.yml/badge.svg?event=push)
