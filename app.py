@@ -6,7 +6,6 @@ import requests
 import orjson
 import typing
 import os
-import uvicorn
 
 
 # Get the current directory
@@ -223,7 +222,3 @@ def players_api(user: str = Depends(authenticate_api_key)):
 def gameweek_number():
     gameweek = current_gameweek()
     return gameweek.item()
-
-
-if __name__ == '__main__':
-    uvicorn.run(app=app)
