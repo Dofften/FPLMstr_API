@@ -6,6 +6,7 @@ import requests
 import orjson
 import typing
 import os
+import uvicorn
 
 
 # Get the current directory
@@ -225,4 +226,4 @@ def gameweek_number():
 
 
 if __name__ == '__main__':
-    app.run()
+    uvicorn.run(app=app)
