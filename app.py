@@ -222,3 +222,7 @@ def players_api(user: str = Depends(authenticate_api_key)):
 def gameweek_number():
     gameweek = current_gameweek()
     return gameweek.item()
+
+
+if __name__ == '__main__':
+    app.run()
