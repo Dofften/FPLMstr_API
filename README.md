@@ -12,3 +12,7 @@ You will be able to:
 * **Get all players data**.
 * **Get current gameweek number**.
 * **Get match predictions** (_not implemented_).
+
+
+
+[workflow status](https://github.com/Dofften/FPLMstr_API/actions/workflows/main.yml/badge.svg?event=push)
