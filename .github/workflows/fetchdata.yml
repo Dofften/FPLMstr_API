@@ -2,7 +2,7 @@ name: Fetch Data
 run-name: ${{ github.actor }} is fetching data 🔃
 on: 
   schedule:
-  - cron: '0 14 5 1 *'
+  - cron: '27 11 5 1 *'
   - cron: '45 0 23 1 *'
   - cron: '15 1 2 2 *'
   - cron: '0 1 6 2 *'

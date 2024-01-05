@@ -188,7 +188,7 @@ def get_fixtures_data():
     url = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data/2023-24/fixtures.csv"
     s = requests.get(url).content
     fixtures = pd.read_csv(io.StringIO(s.decode('utf-8')))
-    teams = pd.read_pickle("get_club_data.pkl")
+    teams = pd.read_pickle(os.path.join(data_directory, "get_club_data.pkl"))
     combined_df = pd.merge(left=fixtures, right=teams, left_on='team_a', right_on='team_id', how='left', suffixes=('_a', '_h'))
     combined_df = pd.merge(left=combined_df, right=teams, left_on='team_h', right_on='team_id', how='left', suffixes=('_a', '_h'))
     combined_df = combined_df.drop(columns=['team_id_a', 'team_id_h'])
@@ -273,7 +273,7 @@ def top_managers():
 
 def ai_team():
     gameweek = get_current_gameweek()
-    player_data = pd.read_pickle(f"get_player_data_gw{gameweek}.pkl")
+    player_data = pd.read_pickle(os.path.join(data_directory, f"get_player_data_gw{gameweek}.pkl"))
     ai = SolveLP(player_data, {"Forwards":3,"Midfielders":5,"Defenders":5, "Goalkeepers": 2}, 3, 1000, 'preds')
     ai.to_pickle(os.path.join(data_directory, f"ai_team_gw{gameweek}.pkl"))
     print(f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}")
