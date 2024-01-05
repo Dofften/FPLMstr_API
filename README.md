@@ -1,3 +1,6 @@
+
+![workflow status](https://github.com/Dofften/FPLMstr_API/actions/workflows/main.yml/badge.svg)
+
 ## FPL Mstr API helps you do awesome Fantasy Premier League stuff. 🚀
 
 ### Functionalities
@@ -14,5 +17,3 @@ You will be able to:
 * **Get match predictions** (_not implemented_).
 
 
-
-[!workflow status](https://github.com/Dofften/FPLMstr_API/actions/workflows/main.yml/badge.svg?event=push)
