@@ -25,13 +25,4 @@ jobs:
       - name: Test fetch data
         run: |
           python test_fetch.py
-      - name: Configure Git
-        run: |
-          git config --global user.email ${GITHUB_ACTOR}@gmail.com
-          git config --global user.name ${GITHUB_ACTOR}
-      - name: Commit and Push
-        run: |
-          git add .
-          git commit -m "gh-actions updated gw data"
-          git push --force https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git HEAD:${REMOTE_BRANCH}
       - run: echo "🍏 This job's status is ${{ job.status }}."
