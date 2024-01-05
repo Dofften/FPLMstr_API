@@ -25,4 +25,11 @@ jobs:
       - name: Test fetch data
         run: |
           python test_fetch.py
+      - name: Deploy to production
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: ftp.crepant.com
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          server-dir: /
       - run: echo "🍏 This job's status is ${{ job.status }}."

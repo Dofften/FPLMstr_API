@@ -57,4 +57,11 @@ jobs:
           git add .
           git commit -m "gh-actions updated gw data"
           git push --force https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git HEAD:${REMOTE_BRANCH}
+      - name: Deploy to production
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: ftp.crepant.com
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          server-dir: /
       - run: echo "🍏 This job's status is ${{ job.status }}."
