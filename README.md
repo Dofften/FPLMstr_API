@@ -15,5 +15,3 @@ You will be able to:
 * **Get all players data**.
 * **Get current gameweek number**.
 * **Get match predictions** (_not implemented_).
-
-

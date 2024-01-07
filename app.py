@@ -6,7 +6,7 @@ import requests
 import orjson
 import typing
 import os
-import uvicorn
+from a2wsgi import ASGIMiddleware
 
 
 # Get the current directory
@@ -19,14 +19,14 @@ data_directory = os.path.join(current_directory, 'data')
 api_keys = os.environ
 
 
-def authenticate_api_key(bearer: str = Header(None)):
-    if not bearer or bearer not in api_keys.values():
+def authenticate_api_key(Authorization: str = Header(None)):
+    if not Authorization or Authorization not in api_keys.values():
         raise HTTPException(
             status_code=401,
             detail="API key is missing or invalid",
             headers={"WWW-Authenticate": "APIKey"},
         )
-    return bearer
+    return Authorization
 
 
 class ORJSONResponse(JSONResponse):
@@ -70,7 +70,6 @@ app = FastAPI(default_response_class=ORJSONResponse,
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
 )
-
 
 def SolveLP(df, SquadComposition, MaxElementsPerTeam, BudgetLimit):
     # Get a list of players
@@ -225,5 +224,4 @@ def gameweek_number():
     return gameweek.item()
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+application = ASGIMiddleware(app)
