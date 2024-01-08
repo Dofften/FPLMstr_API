@@ -6,7 +6,6 @@ import requests
 import orjson
 import typing
 import os
-from a2wsgi import ASGIMiddleware
 
 
 # Get the current directory
@@ -183,7 +182,7 @@ def ai_team_data():
 
 
 @app.get("/api/fixtures")
-def fixtures_api(user: str = Depends(authenticate_api_key)):
+async def fixtures_api(user: str = Depends(authenticate_api_key)):
     fixtures = fixtures_data()
     fixtures['event'] = fixtures['event'].fillna(0)
     fixturesdf = fixtures[['code','event','id','team_a','team_h','team_a_difficulty','team_h_difficulty','team_code_a', 'team_code_h','team_name_a','team_name_h','team_short_name_a','team_short_name_h']]
@@ -191,37 +190,34 @@ def fixtures_api(user: str = Depends(authenticate_api_key)):
 
 
 @app.get("/api/fpl/{team_id}")
-def fpl_team(team_id: int, user: str = Depends(authenticate_api_key)):
+async def fpl_team(team_id: int, user: str = Depends(authenticate_api_key)):
     team_data = get_team_data(team_id, gameweek=current_gameweek())
     team_data=team_data.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
     return team_data.to_dict(orient="records")
 
 
 @app.get("/api/top250")
-def top_FPL_managers(user: str = Depends(authenticate_api_key)):
+async def top_FPL_managers(user: str = Depends(authenticate_api_key)):
     top_team = top_managers_data()
     top_team=top_team.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
     return top_team.to_dict(orient="records")
 
 
 @app.get("/api/ai")
-def ai_team(user: str = Depends(authenticate_api_key)):
+async def ai_team(user: str = Depends(authenticate_api_key)):
     ai = ai_team_data()
     ai=ai.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
     return ai.to_dict(orient="records")
 
 
 @app.get("/api/players")
-def players_api(user: str = Depends(authenticate_api_key)):
+async def players_api(user: str = Depends(authenticate_api_key)):
     all_players = player_data()
     all_players=all_players.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
     return all_players.to_dict(orient="records")
 
 
 @app.get("/api/gameweek_number")
-def gameweek_number():
+async def gameweek_number():
     gameweek = current_gameweek()
     return gameweek.item()
-
-
-application = ASGIMiddleware(app)
