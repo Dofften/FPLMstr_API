@@ -1,5 +1,1 @@
-from a2wsgi import ASGIMiddleware
-from app import app
-
-
-application = ASGIMiddleware(app)
+from app import app as application

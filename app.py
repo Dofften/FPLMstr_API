@@ -1,11 +1,9 @@
-from fastapi import Depends, FastAPI, HTTPException, Header
-from fastapi.responses import JSONResponse
 import pulp
 import pandas as pd
 import requests
-import orjson
-import typing
 import os
+from flask import Flask, request, jsonify
+from functools import wraps
 
 
 # Get the current directory
@@ -18,57 +16,20 @@ data_directory = os.path.join(current_directory, 'data')
 api_keys = os.environ
 
 
-def authenticate_api_key(Authorization: str = Header(None)):
-    if not Authorization or Authorization not in api_keys.values():
-        raise HTTPException(
-            status_code=401,
-            detail="API key is missing or invalid",
-            headers={"WWW-Authenticate": "APIKey"},
-        )
-    return Authorization
+app = Flask(__name__)
 
 
-class ORJSONResponse(JSONResponse):
-    media_type = "application/json"
+def authorization_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        headers = request.headers
+        auth = headers.get("Authorization")
+        if auth in api_keys.values():
+            return func(*args, **kwargs)
+        else:
+            return jsonify({"message": "ERROR: Unauthorized"}), 401
+    return decorated_function
 
-    def render(self, content: typing.Any) -> bytes:
-        return orjson.dumps(content)
-
-
-description = """
-## FPL Mstr API helps you do awesome Fantasy Premier League stuff. 🚀
-
-### Functionalities
-
-You will be able to:
-
-* **Get current gameweek fixtures**.
-* **Get any manager's team**.
-* **Get current gameweek fixtures**.
-* **Get template team for top 250 managers**.
-* **Get best team for coming gameweek predicted by AI**.
-* **Get all players data**.
-* **Get current gameweek number**.
-* **Get match predictions** (_not implemented_).
-"""
-
-
-app = FastAPI(default_response_class=ORJSONResponse,
-    title="FPL Mstr API",
-    description=description,
-    summary="*FPL Mstr API is a developer friendly API built to give developers some crucial Fantasy Premier League data to build upon.*",
-    version="0.0.1",
-    terms_of_service="http://fplmaster.crepant.com/tos",
-    contact={
-        "name": "Frank Omondi",
-        "url": "https://crepant.com",
-        "email": "frank@crepant.com",
-    },
-    license_info={
-        "name": "Apache 2.0",
-        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-    },
-)
 
 def SolveLP(df, SquadComposition, MaxElementsPerTeam, BudgetLimit):
     # Get a list of players
@@ -181,43 +142,51 @@ def ai_team_data():
     return ai
 
 
-@app.get("/api/fixtures")
-async def fixtures_api(user: str = Depends(authenticate_api_key)):
+@app.route("/api/fixtures")
+@authorization_required
+def fixtures_api():
     fixtures = fixtures_data()
     fixtures['event'] = fixtures['event'].fillna(0)
     fixturesdf = fixtures[['code','event','id','team_a','team_h','team_a_difficulty','team_h_difficulty','team_code_a', 'team_code_h','team_name_a','team_name_h','team_short_name_a','team_short_name_h']]
-    return fixturesdf.to_dict(orient="records")
+    return { "fixtures": fixturesdf.to_dict(orient="records") }
 
 
-@app.get("/api/fpl/{team_id}")
-async def fpl_team(team_id: int, user: str = Depends(authenticate_api_key)):
+@app.route("/api/fpl/{team_id}")
+@authorization_required
+def fpl_team(team_id: int):
     team_data = get_team_data(team_id, gameweek=current_gameweek())
     team_data=team_data.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
-    return team_data.to_dict(orient="records")
+    return { "my_team": team_data.to_dict(orient="records") }
 
 
-@app.get("/api/top250")
-async def top_FPL_managers(user: str = Depends(authenticate_api_key)):
+@app.route("/api/top250")
+@authorization_required
+def top_FPL_managers():
     top_team = top_managers_data()
     top_team=top_team.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
-    return top_team.to_dict(orient="records")
+    return { "top250": top_team.to_dict(orient="records") }
 
 
-@app.get("/api/ai")
-async def ai_team(user: str = Depends(authenticate_api_key)):
+@app.route("/api/ai")
+@authorization_required
+def ai_team():
     ai = ai_team_data()
     ai=ai.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
-    return ai.to_dict(orient="records")
+    return { "ai": ai.to_dict(orient="records") }
 
 
-@app.get("/api/players")
-async def players_api(user: str = Depends(authenticate_api_key)):
+@app.route("/api/players")
+@authorization_required
+def players_api():
     all_players = player_data()
     all_players=all_players.merge(club_data()[['team_code','team_id','team_name','team_short_name']], left_on='team', right_on='team_id')
-    return all_players.to_dict(orient="records")
+    return { 'players': all_players.to_dict(orient="records") }
 
 
 @app.get("/api/gameweek_number")
-async def gameweek_number():
+def gameweek_number():
     gameweek = current_gameweek()
-    return gameweek.item()
+    return f"{gameweek}"
+
+if __name__ == "__main__":
+    app.run()
