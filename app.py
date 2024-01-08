@@ -188,5 +188,8 @@ def gameweek_number():
     gameweek = current_gameweek()
     return f"{gameweek}"
 
+
 if __name__ == '__main__':
     app.run()
+
+    
