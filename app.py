@@ -183,10 +183,10 @@ def players_api():
     return { 'players': all_players.to_dict(orient="records") }
 
 
-@app.get("/api/gameweek_number")
+@app.route("/api/gameweek_number")
 def gameweek_number():
     gameweek = current_gameweek()
     return f"{gameweek}"
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()
