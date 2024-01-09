@@ -3,7 +3,7 @@
 
 ## FPL Mstr API helps you do awesome Fantasy Premier League stuff. 🚀
 
-### core* Functionalities
+### Core Functionalities
 
 You will be able to:
 
