@@ -151,7 +151,7 @@ def fixtures_api():
     return { "fixtures": fixturesdf.to_dict(orient="records") }
 
 
-@app.route("/api/fpl/{team_id}")
+@app.route("/api/fpl/<int:team_id>")
 @authorization_required
 def fpl_team(team_id: int):
     team_data = get_team_data(team_id, gameweek=current_gameweek())
