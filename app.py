@@ -4,6 +4,7 @@ import numpy as np
 import requests
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from functools import wraps
 
 
@@ -18,6 +19,7 @@ api_keys = os.environ
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 def authorization_required(func):
