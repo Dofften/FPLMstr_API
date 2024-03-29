@@ -420,21 +420,33 @@ def top_managers():
     return top250df
 
 
-def ai_team():
+def ai_team(team_type):
     gameweek = get_current_gameweek()
     player_data = pd.read_pickle(
         os.path.join(data_directory, f"get_player_data_gw{gameweek}.pkl")
     )
-    ai = SolveLP(
-        player_data,
-        {"Forwards": 3, "Midfielders": 5, "Defenders": 5, "Goalkeepers": 2},
-        3,
-        1000,
-        "preds",
-    )
-    ai.to_pickle(os.path.join(data_directory, f"ai_team_gw{gameweek}.pkl"))
-    print(f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}")
-    return ai
+    if team_type=="Fantasy":
+        ai = SolveLP(
+            df=player_data,
+            SquadComposition={"Forwards": 3, "Midfielders": 5, "Defenders": 5, "Goalkeepers": 2},
+            MaxElementsPerTeam=3,
+            BudgetLimit=1000,
+            feature="preds",
+        )
+        ai.to_pickle(os.path.join(data_directory, f"ai_team_gw{gameweek}.pkl"))
+        print(f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}")
+        return ai
+    else:
+        ai = SolveLP(
+            df=player_data,
+            SquadComposition={"Forwards": 3, "Midfielders": 5, "Defenders": 5, "Goalkeepers": 2},
+            MaxElementsPerTeam=5,
+            BudgetLimit=1000,
+            feature="preds",
+        )
+        ai.to_pickle(os.path.join(data_directory, f"FPL_challenge_gw{gameweek}.pkl"))
+        print(f"Successfully created FPL Challenge team for GameWeek {gameweek} on: {time.ctime()}")
+        return ai
 
 
 def main():
@@ -444,7 +456,8 @@ def main():
     get_club_data()
     get_fixtures_data()
     top_managers()
-    ai_team()
+    ai_team("Fantasy")
+    ai_team("FPL Challenge")
 
 
 if __name__ == "__main__":

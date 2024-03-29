@@ -179,6 +179,12 @@ def ai_team_data():
     return ai
 
 
+def fpl_challenge_data():
+    gameweek = current_gameweek()
+    ai = pd.read_pickle(os.path.join(data_directory, f"FPL_challenge_gw{gameweek}.pkl"))
+    return ai
+
+
 @app.route("/api/fixtures")
 @authorization_required
 def fixtures_api():
@@ -235,6 +241,19 @@ def top_FPL_managers():
 @authorization_required
 def ai_team():
     ai = ai_team_data()
+    ai = ai.merge(
+        club_data()[["team_code", "team_id", "team_name", "team_short_name"]],
+        left_on="team",
+        right_on="team_id",
+    )
+    ai = ai.replace({np.nan: None})
+    return {"ai": ai.to_dict(orient="records")}
+
+
+@app.route("/api/fpl-challenge")
+@authorization_required
+def fpl_challenge():
+    ai = fpl_challenge_data()
     ai = ai.merge(
         club_data()[["team_code", "team_id", "team_name", "team_short_name"]],
         left_on="team",
