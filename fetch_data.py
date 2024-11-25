@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pulp")
 current_directory = os.getcwd()
 # Define the path to the directories within the current directory
 models_directory = os.path.join(current_directory, "models")
-data_directory = os.path.join(current_directory, "data")
+data_directory = os.path.join(current_directory, "data2425")
 
 
 # Overall FPL league ID, 314 for 2019/20 season.
@@ -278,7 +278,7 @@ def get_player_data():
 
 
 def get_club_data():
-    url = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data/2023-24/teams.csv"
+    url = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data/2024-25/teams.csv"
     s = requests.get(url).content
     teams = pd.read_csv(io.StringIO(s.decode("utf-8")))
     teams.rename(
@@ -305,7 +305,7 @@ def get_current_gameweek():
 
 
 def get_fixtures_data():
-    url = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data/2023-24/fixtures.csv"
+    url = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data/2024-25/fixtures.csv"
     s = requests.get(url).content
     fixtures = pd.read_csv(io.StringIO(s.decode("utf-8")))
     teams = pd.read_pickle(os.path.join(data_directory, "get_club_data.pkl"))
@@ -425,27 +425,41 @@ def ai_team(team_type):
     player_data = pd.read_pickle(
         os.path.join(data_directory, f"get_player_data_gw{gameweek}.pkl")
     )
-    if team_type=="Fantasy":
+    if team_type == "Fantasy":
         ai = SolveLP(
             df=player_data,
-            SquadComposition={"Forwards": 3, "Midfielders": 5, "Defenders": 5, "Goalkeepers": 2},
+            SquadComposition={
+                "Forwards": 3,
+                "Midfielders": 5,
+                "Defenders": 5,
+                "Goalkeepers": 2,
+            },
             MaxElementsPerTeam=3,
             BudgetLimit=1000,
             feature="preds",
         )
         ai.to_pickle(os.path.join(data_directory, f"ai_team_gw{gameweek}.pkl"))
-        print(f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}")
+        print(
+            f"Successfully created AI team for GameWeek {gameweek} on: {time.ctime()}"
+        )
         return ai
     else:
         ai = SolveLP(
             df=player_data,
-            SquadComposition={"Forwards": 3, "Midfielders": 5, "Defenders": 5, "Goalkeepers": 2},
+            SquadComposition={
+                "Forwards": 3,
+                "Midfielders": 5,
+                "Defenders": 5,
+                "Goalkeepers": 2,
+            },
             MaxElementsPerTeam=5,
             BudgetLimit=1000,
             feature="preds",
         )
         ai.to_pickle(os.path.join(data_directory, f"FPL_challenge_gw{gameweek}.pkl"))
-        print(f"Successfully created FPL Challenge team for GameWeek {gameweek} on: {time.ctime()}")
+        print(
+            f"Successfully created FPL Challenge team for GameWeek {gameweek} on: {time.ctime()}"
+        )
         return ai
 
 

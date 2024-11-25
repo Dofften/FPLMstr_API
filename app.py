@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import pulp
 import pandas as pd
 import numpy as np
@@ -7,12 +8,13 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import wraps
 
+load_dotenv()
 
 # Get the current directory
 current_directory = os.getcwd()
 # Define the path to the directories within the current directory
 models_directory = os.path.join(current_directory, "models")
-data_directory = os.path.join(current_directory, "data")
+data_directory = os.path.join(current_directory, "data2425")
 
 
 api_keys = os.environ
