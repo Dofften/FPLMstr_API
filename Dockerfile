@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 
-CMD ["waitress-serve", "app:app"]
+CMD ["python", "app.py"]
