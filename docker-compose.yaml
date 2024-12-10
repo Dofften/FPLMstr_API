@@ -4,4 +4,4 @@ services:
   fplmstrapi:
     build: .
     ports:
-      - "5001:5000"
+      - "5001:80"
