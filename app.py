@@ -7,6 +7,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import wraps
+from waitress import serve
 
 load_dotenv()
 
@@ -285,4 +286,4 @@ def gameweek_number():
 
 
 if __name__ == "__main__":
-    app.run(port=80)
+    serve(app, port="8000")
