@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 
-CMD ["python", "server.py"]
+CMD ["python", "app.py"]
