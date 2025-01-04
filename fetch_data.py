@@ -398,6 +398,18 @@ def top_managers():
         (lambda x: count_dict_all.get(x, 0) * 0.4)
     )
 
+    # Remove one of the duplicate columns if both exist
+    if (
+        "element_type_x" in final_dataframe_all.columns
+        and "element_type_y" in final_dataframe_all.columns
+    ):
+        final_dataframe_all["element_type"] = final_dataframe_all[
+            "element_type_x"
+        ]  # Keep one
+        final_dataframe_all.drop(
+            columns=["element_type_x", "element_type_y"], inplace=True
+        )
+
     # Remove duplicate rows
     df_unique = final_dataframe_all.drop_duplicates(subset=["web_name"], keep="first")
 
