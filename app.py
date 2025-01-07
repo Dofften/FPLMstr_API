@@ -134,6 +134,13 @@ def get_team_data(entry_id, gameweek):
         left_on="element",
         right_on="id",
     )
+    # Remove one of the duplicate columns if both exist
+    if (
+        "element_type_x" in team_picks.columns
+        and "element_type_y" in team_picks.columns
+    ):
+        team_picks["element_type"] = team_picks["element_type_x"]  # Keep one
+        team_picks.drop(columns=["element_type_x", "element_type_y"], inplace=True)
     team_picks["photo"] = team_picks["photo"].str.replace(".jpg", ".png", regex=False)
     return team_picks
 
